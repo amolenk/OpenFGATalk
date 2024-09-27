@@ -10,7 +10,7 @@ return;
 
 static async Task CheckInAsync()
 {
-    var response = await CallApiAsync("/check-in", new Claim(ClaimTypes.Role, "passenger"));
+    var response = await CallApiAsync("/check-in", new Claim(ClaimTypes.NameIdentifier, "alice"));
     if (response.IsSuccessStatusCode)
     {
         Console.WriteLine(await response.Content.ReadAsStringAsync());

@@ -1,0 +1,159 @@
+@hostname2=localhost
+@port2=7074
+@host2={{hostname2}}:{{port2}}
+
+###
+
+GET https://{{host2}}/test
+
+
+###
+
+@hostname=localhost
+@port=8080
+@host={{hostname}}:{{port}}
+
+###
+
+GET http://{{host}}/stores
+
+###
+
+POST http://{{host}}/stores
+Content-Type: application/json
+
+{
+    "name": "Store 1"
+}
+
+###
+
+@storeId=01J8H8F7XGWRDA13SMSF1DFPBD
+
+###
+
+POST http://{{host}}/stores/{{storeId}}/authorization-models
+Content-Type: application/json
+
+{
+  "schema_version": "1.1",
+  "type_definitions": [
+    {
+      "type": "user",
+      "relations": {},
+      "metadata": null
+    },
+    {
+      "type": "flight",
+      "relations": {
+        "passenger": {
+          "this": {}
+        }
+      },
+      "metadata": {
+        "relations": {
+          "passenger": {
+            "directly_related_user_types": [
+              {
+                "type": "user"
+              },
+              {
+                "type": "group_booking",
+                "relation": "member"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "group_booking",
+      "relations": {
+        "member": {
+          "this": {}
+        }
+      },
+      "metadata": {
+        "relations": {
+          "member": {
+            "directly_related_user_types": [
+              {
+                "type": "user"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
+
+###
+
+@modelId=01J8H8Z2SBEPMEREY388X7CJ2C
+
+###
+
+POST http://{{host}}/stores/{{storeId}}/write
+Content-Type: application/json
+
+{
+  "writes": {
+    "tuple_keys": [
+      {
+        "user": "user:alice",
+        "relation": "member",
+        "object": "group_booking:ndc_porto"
+      }
+    ]
+  },
+  "authorization_model_id": "{{modelId}}"
+}
+
+###
+
+POST http://{{host}}/stores/{{storeId}}/check
+Content-Type: application/json
+
+{
+  "tuple_key": {
+    "user": "user:alice",
+    "relation": "member",
+    "object": "group_booking:ndc_porto"
+  },
+  "authorization_model_id": "{{modelId}}"
+}
+
+###
+
+POST http://{{host}}/stores/{{storeId}}/check
+Content-Type: application/json
+
+{
+  "tuple_key": {
+    "user": "user:alice",
+    "relation": "passenger",
+    "object": "flight:kl1571"
+  },
+  "authorization_model_id": "{{modelId}}"
+}
+
+###
+
+POST http://{{host}}/stores/{{storeId}}/write
+Content-Type: application/json
+
+{
+  "writes": {
+    "tuple_keys": [
+      {
+        "user": "group_booking:ndc_porto#member",
+        "relation": "passenger",
+        "object": "flight:kl1571"
+      }
+    ]
+  },
+  "authorization_model_id": "{{modelId}}"
+}
+
+

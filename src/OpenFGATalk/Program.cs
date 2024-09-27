@@ -1,9 +1,6 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using OpenFGATalk.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,22 +17,32 @@ builder.Services.AddAuthentication("Bearer")
             SignatureValidator = (token, _) => new JsonWebToken(token)
         };
     });
-builder.Services.AddAuthorization();
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("check-in", policy => policy.RequireRole("passenger"))
+    .AddPolicy("fast-lane", policy => policy.RequireAssertion(context => 
+    {
+        var isCheckedIn = context.User.HasClaim(claim => claim is { Type: "checked_in", Value: "true" });
+        
+        var isPremiumFrequentFlyer = context.User.HasClaim(
+            claim => claim is { Type: "frequent_flyer_status", Value: "silver" or "gold" or "platinum" });
+            
+        return isCheckedIn && isPremiumFrequentFlyer;
+    }))
+    .AddPolicy("lounge", policy => policy.RequireAssertion(_ => false))
+    .AddPolicy("check-in", policy => policy.RequireOpenFgaCheck("can-check-in", "flight:KL1571"));
+
+
 
 var app = builder.Build();
 
 app.MapGet("/check-in", () => "You are checked in!")
-    .RequireAuthorization(configure => configure.RequireRole("passenger"));
+    .RequireAuthorization("check-in");
 
 app.MapGet("/access-fast-lane", () => "You are allowed in the security fast lane!")
-    .RequireAuthorization(configure =>  configure.RequireAssertion(context => 
-    {
-        var isCheckedIn = context.User.HasClaim(claim => claim is { Type: "checked_in", Value: "true" });
-        var isPremiumFrequentFlyer = context.User.HasClaim(claim => claim is { Type: "frequent_flyer_status", Value: "silver" or "gold" or "platinum" });
-            
-        return isCheckedIn && isPremiumFrequentFlyer;
-    }));
+    .RequireAuthorization("fast-lane");
 
-app.MapGet("/access-lounge", () => Results.Forbid());
+app.MapGet("/access-lounge", () => "You are allowed in the lounge!")
+    .RequireAuthorization("lounge");
 
 app.Run();
