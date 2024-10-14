@@ -2,21 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace OpenFGATalk.Authorization;
 
-internal class OpenFgaRequirement : IAuthorizationRequirement
+internal class OpenFgaRequirement(string relation, Func<HttpContext, string> getObject) : IAuthorizationRequirement
 {
-    public OpenFgaRequirement(string relation, string obj)
-        : this(null, relation, obj)
-    {
-    }
-
-    public OpenFgaRequirement(string? user, string relation, string obj)
-    {
-        User = user;
-        Relation = relation;
-        Object = obj;
-    }
-    
-    public string? User { get; }
-    public string Relation { get; }
-    public string Object { get; }
+    public string Relation { get; } = relation;
+    public Func<HttpContext, string> GetObject { get; } = getObject;
 }

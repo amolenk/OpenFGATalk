@@ -1,0 +1,13 @@
+model
+  schema 1.1
+
+type user
+
+type flight
+  relations
+    define ticket_holder: [user with minimum_age]
+    define can_check_in: ticket_holder
+
+condition minimum_age(age: int, required_age: int) {
+  age >= required_age
+}

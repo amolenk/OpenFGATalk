@@ -3,7 +3,7 @@ using OpenFga.Sdk.Client;
 
 namespace OpenFGATalk.Authorization;
 
-public static class Extensions
+public static class WebApplicationBuilderExtensions
 {
     public static WebApplicationBuilder AddOpenFgaAuthorization(this WebApplicationBuilder builder)
     {
@@ -17,18 +17,6 @@ public static class Extensions
             .AddSingleton<OpenFgaClient>(_ => new OpenFgaClient(configuration))
             .AddSingleton<IAuthorizationHandler, OpenFgaAuthorizationHandler>();
 
-        return builder;
-    }
-
-    public static AuthorizationPolicyBuilder RequireOpenFgaCheck(this AuthorizationPolicyBuilder builder, string relation, string obj)
-    {
-        builder.Requirements.Add(new OpenFgaRequirement(relation, obj));
-        return builder;
-    }
-
-    public static AuthorizationPolicyBuilder RequireOpenFgaCheck(this AuthorizationPolicyBuilder builder, string user, string relation, string obj)
-    {
-        builder.Requirements.Add(new OpenFgaRequirement(user, relation, obj));
         return builder;
     }
 }

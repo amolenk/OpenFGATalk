@@ -1,0 +1,21 @@
+name: Check-in
+model_file: ./conditions.fga
+tuples:
+
+  - user: user:alice
+    relation: ticket_holder
+    object: flight:oc815
+    condition: 
+        name: minimum_age
+        context: 
+          age: 35
+
+tests:
+  - name: test-1
+    check:
+      - user: user:alice
+        object: flight:oc815
+        context: 
+          required_age: 50
+        assertions:
+          can_check_in: true

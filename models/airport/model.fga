@@ -1,0 +1,47 @@
+model
+  schema 1.1
+
+type user
+
+type flight
+  relations
+    define ticket_holder: [user, group_booking#member] or passenger
+    define passenger: [user, group_booking#member]
+    define operator: [airline]
+    define can_check_in:ticket_holder
+    define can_board: passenger
+    define can_view_invoice: ticket_holder
+
+type group_booking
+  relations
+    define member: [user]
+
+type frequent_flyer_level
+  relations
+    define member: [user] or member from parent
+    define parent: [frequent_flyer_level]
+
+type frequent_flyer_benefit
+  relations
+    define level: [frequent_flyer_level]
+    define is_eligible: member from level
+
+type airline
+  relations
+    define flight: [flight]
+    define partner_airline: [airline]
+    define passenger: passenger from flight
+    define partner_passenger: passenger from partner_airline
+
+type premium_credit_card
+  relations
+    define holder: [user]
+
+type lounge
+  relations
+    define single_entry: [user]
+    define frequent_flyer_benefit: [frequent_flyer_benefit]
+    define credit_card_partnership: [premium_credit_card]
+    define operator: [airline]
+    define has_access: single_entry or (is_eligible from frequent_flyer_benefit and (passenger from operator or partner_passenger from operator)) or holder from credit_card_partnership
+

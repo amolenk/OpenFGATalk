@@ -1,0 +1,16 @@
+model
+  schema 1.1
+
+type user
+
+type flight
+  relations
+    define ticket_holder: [user, group_booking#member] or passenger
+    define passenger: [user, group_booking#member]
+    define can_check_in: ticket_holder
+    define can_view_invoice: ticket_holder
+    define can_board: passenger
+
+type group_booking
+  relations
+    define member: [user]

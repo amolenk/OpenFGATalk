@@ -1,0 +1,45 @@
+# Guy has a ticket for flight oc815
+- user: user:guy
+  relation: ticket_holder
+  object: flight:oc815
+
+# His flight is operated by Oceanic Airline
+- user: flight:oc815
+  relation: flight
+  object: airline:oceanic
+
+# Oceanic Airlines operates a lounge
+- user: airline:oceanic
+  relation: operator
+  object: lounge:oceanic
+
+# Azure Airways operates a lounge
+- user: airline:azure
+  relation: operator
+  object: lounge:azure
+
+# Guy has a Jetsetter frequent flyer membership
+- user: user:guy
+  relation: member
+  object: frequent_flyer_level:jetsetter
+
+# The Jetsetter level entitles members to priority lane
+- user: frequent_flyer_level:jetsetter
+  relation: level
+  object: frequent_flyer_benefit:priority_lane
+
+# The Jetsetter level gives members access to lounges
+- user: frequent_flyer_level:jetsetter
+  relation: level
+  object: frequent_flyer_benefit:lounge
+
+# The Oceanic Airlines lounge participates in the frequent flyer program
+- user: frequent_flyer_benefit:lounge
+  relation: frequent_flyer_benefit
+  object: lounge:oceanic
+
+# The Azure Airways lounge participates in the frequent flyer program
+- user: frequent_flyer_benefit:lounge
+  relation: frequent_flyer_benefit
+  object: lounge:azure
+

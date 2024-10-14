@@ -1,0 +1,40 @@
+name: Check-in
+model_file: ./model.fga
+tuples:
+
+  - user: user:alice
+    relation: passenger
+    object: flight:oc815
+
+  - user: user:alice
+    relation: ticket_holder
+    object: flight:oc1016
+
+  - user: user:guy
+    relation: member
+    object: group_booking:ndc
+
+  - user: group_booking:ndc#member
+    relation: ticket_holder
+    object: flight:oc815
+
+tests:
+
+  - name: test-1
+    check:
+      - user: user:guy
+        object: flight:oc815
+        assertions:
+          can_check_in: true
+          can_board: false
+
+  - name: test-2
+    list_objects:
+      - user: user:alice
+        type: flight
+        assertions:
+          can_board:
+            - flight:oc815
+          can_view_invoice:
+            - flight:oc1016
+            - flight:oc815
